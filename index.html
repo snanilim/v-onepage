@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Api File Upload</title>
+</head>
+<body>
+   <form action="http://192.168.3.213:3000/api/register" method="post" enctype="multipart/form-data">
+       <div>
+           <label>
+               Name: <input type="text" name="visitor_name">
+           </label>
+
+       </div>
+       <div>
+           <label>
+               Mobile: <input type="number" name="visitor_contact">
+           </label>
+       </div>
+       <div>
+           <label>
+               Company Name: <input type="text" name="company_name">
+           </label>
+       </div>
+       <div>
+           <label>
+               Company Address: <input type="text" name="company_address">
+           </label>
+       </div>
+       <div>
+           <label>
+               Host: <input type="text" name="host_id">
+           </label>
+       </div>
+       <div>
+           <label>
+               Designation: <input type="text" name="designation">
+           </label>
+       </div>
+       <div>
+           <label>
+               Gaurd ID: <input type="text" name="gaurd_id">
+           </label>
+
+       </div>
+       <input type="file" name="visitor_pic" >
+       <input type="submit" name="submit" value="Submit">
+   </form>
+</body>
+</html>
