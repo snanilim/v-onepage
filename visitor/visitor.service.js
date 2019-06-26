@@ -1,3 +1,28 @@
+const gcm = require('node-gcm');
+const {builder, data_host} = require('../helper');
+
+// Firebase Sender ID
+const sender = 'AAAAtycriZo:APA91bE0f-71mkbCtblLbz6WWMYmNaOVBgtvbFF1dhSW40IcjwKFSjVP79AwLKe_8wRYorRDyAWW3krAwOJ7Ekivu4-zXB7uqfqBqh7Zb2ZD7P0HxJZcEPxsUIQNqHvYdbH4PKYNdW9R';
+// Firebase to Device ID
+const deviceid = 'eh31UyJ2tK8:APA91bEC9kl1HPwggBqHblkrtBzXK_2pkhLav1ZyF_yhtXF1LbD6-BE6gZHRQFSCzsZk-FPFluyJwK740OGKXyzoCdbDNDvjl15XPZrzeUc3FVqIa8Pi9Fbuvj-rSRPi0mAPASVG-WDf';
+
+
+
+function save_notfication(host_id,sms) {
+    const query = "INSERT INTO notifications (notify,user_id) value('"+sms+"','"+host_id+"') ";
+    const type = true
+    console.log(query);
+    builder.getresult(query,type,sms,function (result,extra) {
+        if(result){
+            console.log('notification saved')
+        }
+        else{
+            console.log('unable to notification saved')
+        }
+    });
+}
+
+
 /**
  * Get Visitor Data by employee ID
  * @param employee_id
@@ -98,7 +123,7 @@ exports.fn_reject_visitor = (employee_id,log_id,reason) => {
  * @param log_id
  * @returns {*}
  */
-exports.fn_exit_operation = (employee_id,log_id) => {
+exports.fn_exit_operation = (employee_id, log_id) => {
     let emp_id = "";
     let logid  = "";
 
@@ -363,12 +388,13 @@ exports.fn_register = (name,contact,company,host_id,address,gaurd_id,img) => {
  * @param device_id
  * @param host_id
  */
-exports.send_register_notification = (user_id,role,ntype,sms) => {
+const send_register_notification = (user_id,role,ntype,sms) => {
+    console.log('user id', user_id);
     let query = "SELECT device_id from devices WHERE user_id = '"+user_id+"'  group by device_id order by id DESC limit 1";
      const type = true;
  
      builder.getresult(query,type,sms,function (result,extra) {
-         if(result ){
+         if(result && result.length > 0){
              // res.send(result);
              const to_device_first = result[0].device_id;
  
@@ -396,9 +422,8 @@ exports.send_register_notification = (user_id,role,ntype,sms) => {
              sender_init.send(message, registrationIds, function (err, response) {
                  if (err){ console.error(err)}
                  else{
-                         save_notfication(user_id,sms)
- 
-                     console.log(response);
+                    save_notfication(user_id,sms)
+                    console.log(response);
                  }
              });
          }
@@ -406,4 +431,121 @@ exports.send_register_notification = (user_id,role,ntype,sms) => {
              console.log("error sending notofication to User:"+user_id)
          }
      })
+}
+
+exports.send_register_notification = send_register_notification;
+
+
+exports.nofity_accept_reject = (log_id,guard_id,user_id,role,sms,ntype) => {
+    let log_info = "select " +
+        "uhost.full_name as host_name," +
+        "visitor.full_name as visitor_name  from visit_logs  " +
+        "inner join users as uhost ON uhost.id = visit_logs.user_id " +
+        "inner join users as visitor ON visitor.id = visit_logs.visitor_id " +
+        "where visit_logs.id = '"+log_id+"'"
+    let type = true;
+
+    console.log('log info', log_info);
+
+    builder.getresult(log_info,type,sms,function (result,extra) {
+        if(result && result.length > 0 ){
+            console.log(result);
+            // res.send(result);
+          const  custom_sms = "Mr "+result[0].visitor_name+" "+ntype+ " by "+result[0].host_name
+            send_register_notification(guard_id,role,ntype,custom_sms)
+        }
+        else{
+            console.log("error sending notofication to user:"+user_id)
+            return false;
+        }
+    });
+}
+
+
+exports.send_notification = (user_id,sms,guard_id,role,log_id,ntype) => {
+    const id = user_id;
+
+    let query = "";
+    if(log_id == null){
+     query += "SELECT device_id from devices WHERE user_id in ( '"+user_id+"', '"+guard_id+"')   group by device_id order by id DESC limit 2";
+    }
+    else{
+         query += "select devices.device_id as device_id, " +
+            "   uhost.full_name as host_name, " +
+            "       visitor.full_name as visitor_name " +
+            " from visit_logs  " +
+            " inner join users as uhost ON uhost.id = visit_logs.user_id " +
+            " inner join users as visitor ON visitor.id = visit_logs.visitor_id " +
+            " inner Join devices ON devices.user_id = visit_logs.user_id " +
+            " " +
+            "where visit_logs.id = '"+log_id+"' " +
+            "group by device_id " +
+            "order by device_id desc " +
+            "limit 2"
+    }
+    console.log(query)
+    const type = true;
+
+    builder.getresult(query,type,sms,function (result,extra) {
+        let custom_sms = sms;
+        if(result ){
+            // res.send(result);
+            const to_device_first = result[0].device_id;
+            const to_device_sec = result[1].device_id;
+            console.log("Device 1:"+to_device_first)
+            console.log("Device 2:"+to_device_sec)
+            let sender_init = new gcm.Sender(sender);
+
+// Prepare a message to be sent
+            let message = new gcm.Message();
+
+            custom_sms = "Mr "+result[0].visitor_name+" "+ntype+ " by "+result[0].host_name
+            if(ntype === "registered"){
+                message.addData('key1',sms);
+                message.addData('role',role);
+
+                message.addData('message',sms)
+
+                message.addData('title',sms);
+                message.addData('msgcnt',sms);
+            }
+            else{
+            message.addData('key1',custom_sms);
+            message.addData('role',role);
+
+            message.addData('message',custom_sms)
+
+            message.addData('title',custom_sms);
+            message.addData('msgcnt',custom_sms);
+            }
+            message.addData('soundname','beep3');
+            message.delay_while_idle = 1;
+            let registrationIds = [];
+            registrationIds.push(to_device_first)
+            if(guard_id != 0){
+              registrationIds.push(to_device_sec)
+            }
+// Specify which registration IDs to deliver the message to
+            //let regTokens = to_device;
+
+// Actually send the message
+            sender_init.send(message, registrationIds, function (err, response) {
+                if (err){ console.error(err)}
+                else{
+                    if(ntype === "registered"){
+                        save_notfication(user_id,sms)
+                    }
+                    else{
+                        save_notfication(guard_id,custom_sms)
+                    }
+
+                 console.log(response);
+                }
+            });
+        }
+        else{
+            console.log("error sending notofication to User:"+user_id)
+        }
+    });
+
 }

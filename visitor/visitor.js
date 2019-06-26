@@ -10,8 +10,10 @@ const {fn_get_visitors,
     fn_get_pending_list,
     fn_get_exist_list,
     fn_register,
-    send_register_notification
-}
+    send_register_notification,
+    nofity_accept_reject,
+    send_notification
+} = require('./visitor.service');
 
 
 /**
@@ -55,9 +57,9 @@ exports.acceptVisitor = (req,res) => {
     const host_id               = accept_visitor.employee_id
     const log_id                = accept_visitor.log_id
     const type                  = true;
-    const sms                   = "Success" ;
+    const sms                   = "Success";
 
-    console.log(accept_query)
+    console.log('accept_query', accept_query)
     builder.getresult(accept_query,type,sms,function (result) {
         //   if(error) { res.send(500, "Server Error"); return; }
         if(result.affectedRows > 0){
@@ -121,7 +123,7 @@ exports.exitOperation = (req,res) => {
 
     const exit_visitor_param = JSON.stringify(req.body);
     const exit_visitor       = JSON.parse(exit_visitor_param);
-    const exit_query         = fn_exit_operation(exit_visitor.employee_id,exit_visitor.log_id);
+    const exit_query         = fn_exit_operation(exit_visitor.employee_id, exit_visitor.log_id);
     const type               = true;
     const sms                = "Success" ;
 
