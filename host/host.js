@@ -1,4 +1,4 @@
-const {builder} = require('../helper');
+const {builder, data_host} = require('../helper');
 
 /**
  * Host Search-----------------------------------------------------

@@ -373,8 +373,9 @@ exports.fn_register = (name,contact,company,host_id,address,gaurd_id,img) => {
     else if(gaurd_id < 1){
         return false
     }
-
+    console.log(name, address, contact, img)
     const query = "INSERT INTO users (full_name,address,phone,photo) VALUES ('"+name+"','"+address+"','"+contact+"','"+img+"')";
+    console.log(query)
     return query;
 }
 

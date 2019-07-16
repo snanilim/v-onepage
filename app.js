@@ -21,7 +21,7 @@ const urlBodyParse = bodyParser.urlencoded({extended: false})
 moment().tz("Asia/Dhaka").format();
 const storage = Multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, '../webApp/public/images/')
+        cb(null, './public/images/')
     },
     filename: function (req, file, cb) {
         const mime = file.mimetype;
@@ -29,7 +29,7 @@ const storage = Multer.diskStorage({
         cb(null, file.fieldname + '-' + Date.now()+"."+extention[1])
     }
 })
-const upload = Multer({  dest: '../webApp/public/images',storage: storage });
+const upload = Multer({  dest: './public/images',storage: storage });
 const mom =  new Date();
 console.log(moment.tz(mom, "Asia/Dhaka").format().replace("T"," ").replace("+06:00",""));
 
@@ -81,8 +81,7 @@ app.get('/api/visitor/approved/:emp_id/:log_id', visitor.approvedList);
 
 app.get('/api/visitor/info/:visitor_contact', visitor.visitorInfo);
 app.get('/api/host/search/:employee_id/:branch_id', host.hostSearch);
-
 app.get('/api/host/', host.hostList);
-app.post('/api/visitor/register', upload.single('visitor_pic'), visitor.visitorRegister);
+app.post('/api/register', upload.single('visitor_pic'), visitor.visitorRegister);
 
 module.exports = app;

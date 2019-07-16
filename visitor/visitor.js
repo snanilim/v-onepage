@@ -1,4 +1,4 @@
-const {builder} = require('../helper');
+const {builder, web_img_dir} = require('../helper');
 const {fn_get_visitors,
     fn_accept_visitor,
     fn_reject_visitor,
@@ -14,6 +14,8 @@ const {fn_get_visitors,
     nofity_accept_reject,
     send_notification
 } = require('./visitor.service');
+const moment = require('moment-timezone');
+var con = require('../config/database');
 
 
 /**
@@ -308,6 +310,7 @@ exports.visitorInfo = (req,res) => {
 // Register Visitor
 exports.visitorRegister = (req,res,next) => {
     // console.log(req.body);
+    // console.log(req.file);
     if (!req.body) return res.sendStatus(400);
     // console.log("Post Receiving....")
     // console.log(req.file);
@@ -328,6 +331,7 @@ exports.visitorRegister = (req,res,next) => {
     if(register_query){
         builder.getresult(register_query,type,sms,function (result,extra) {
             //   if(error) { res.send(500, "Server Error"); return; }
+            console.log('result', result)
             if(result.insertId){
                 const crdatetime = new Date();
                 // const date = crdatetime.getUTCFullYear() + '-' +

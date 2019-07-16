@@ -1,3 +1,8 @@
+import { AST_DWLoop } from "terser";
+import { ifError } from "assert";
+import { isFunction } from "util";
+import { S_IFBLK } from "constants";
+
 // const mysql = require('mysql');
 
 
@@ -171,3 +176,19 @@ function login_validation() {
 function logout_validation() {
 
 }
+
+function admin(){
+    if (admin) {
+        return "go";
+    } else {
+        return "dont go"
+    }
+}
+
+const admin = () => admin ? "go" : "dont go";
+
+const newOne = () => {
+    const vtracker = "okkkkllllla";
+}
+
+ 
