@@ -1,6 +1,6 @@
 var db = require('../config/database');
 
-const data_host = "http://localhost/vTracker/WebApp/";
+const data_host = "http://192.168.3.213/vTracker/webApp/";
 const web_img_dir   = "public/images/";;
 
 const builder = {
