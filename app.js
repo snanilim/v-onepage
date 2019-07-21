@@ -21,7 +21,7 @@ const urlBodyParse = bodyParser.urlencoded({extended: false})
 moment().tz("Asia/Dhaka").format();
 const storage = Multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, './public/images/')
+        cb(null, '../webApp/public/images/')
     },
     filename: function (req, file, cb) {
         const mime = file.mimetype;
@@ -29,7 +29,7 @@ const storage = Multer.diskStorage({
         cb(null, file.fieldname + '-' + Date.now()+"."+extention[1])
     }
 })
-const upload = Multer({  dest: './public/images',storage: storage });
+const upload = Multer({  dest: '../webApp/public/images',storage: storage });
 const mom =  new Date();
 console.log(moment.tz(mom, "Asia/Dhaka").format().replace("T"," ").replace("+06:00",""));
 

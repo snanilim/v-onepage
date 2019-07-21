@@ -1,7 +1,7 @@
 var db = require('../config/database');
 
 const data_host = "http://localhost/vTracker/WebApp/";
-const web_img_dir   = "./public/images";
+const web_img_dir   = "public/images/";;
 
 const builder = {
     getresult: function (query,type,sms,callback) {
